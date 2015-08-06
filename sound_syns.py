@@ -6,10 +6,9 @@ class SoundSyns:
 
 	key_mappings = {
 		"C" : 220,
-		"E" : 250,
-		"G" : 300,
+		"E" : 277,
+		"G" : 330,
 		"A" : 440,
-		"B" : 880
 	}
 
 	duration = 1 #seconds
