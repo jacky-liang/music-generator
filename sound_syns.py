@@ -11,7 +11,7 @@ class SoundSyns:
 		"A" : 440,
 	}
 
-	duration = 1 #seconds
+	duration = 10 #seconds
 	output_path = "music_output_files/"
 	amplitutde_threshold = 0.95
 	

@@ -19,37 +19,45 @@ class SoundDecomposer:
 	def read(self, fileName):
 		path = SoundDecomposer.music_input_folder + fileName
 		self.rate, self.raw = read(path)
+		if len(self.raw[0]) > 1:
+			self.raw = [e[0] for e in self.raw]
 		self._reset()
-		
+	
+	@property
+	def normalized(self):
+		if self._normalized is None:
+			mu = np.average(self.raw)
+			std = np.std(self.raw)
+			self._normalized = [(e - mu)/std for e in self.raw]
+		return self._normalized
+	
 	def _reset(self):
 		self._rawFreq = None
 		self._logFreq = None
 		self._freqBuckets = None
+		self._normalized = None
 		
 	@property
 	def rawFreq(self):
 		if self._rawFreq is None:
-			self._rawFreq = rfft(self.raw)
+			self._rawFreq = rfft(self.normalized)
 		return self._rawFreq
 
 	@property
 	def logFreq(self):
 		if self._logFreq is None:
-			self._logFreq = {"left":[], "right":[]}
-			#assumes input has 2 channels.
+			self._logFreq = []
 			for i in range(2, len(self.rawFreq)):
-				self._logFreq["left"].append((log(i, 2), self.rawFreq[i][0]))
-				self._logFreq["right"].append((log(i, 2), self.rawFreq[i][1]))
+				self._logFreq.append((log(i, 2), self.rawFreq[i]))
 		return self._logFreq
 		
 	@property
 	def freqBuckets(self):
 		if self._freqBuckets is None:
-			self._freqBuckets = {"left":[], "right":[]}
-			self._bucketize(self.logFreq["left"], self._freqBuckets["left"])
-			self._bucketize(self.logFreq["right"], self._freqBuckets["right"])			
+			self._freqBuckets = []
+			self._bucketize(self.logFreq, self._freqBuckets)
 		return self._freqBuckets
-		
+
 	def _bucketize(self, logFreq, buckets):
 		cur_start = SoundDecomposer.bucket_min_start
 		cur_end = cur_start + SoundDecomposer.bucket_size

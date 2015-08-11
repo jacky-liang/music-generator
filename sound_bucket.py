@@ -6,7 +6,7 @@ class SoundBucket:
 		self.end = end
 		self.freqTable = []
 		self._reset()
-		
+
 	def _reset(self):
 		self._muFreq = None
 		self._muAmp = None
