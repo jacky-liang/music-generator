@@ -27,8 +27,8 @@ class SoundDecomposer:
 	def normalized(self):
 		if self._normalized is None:
 			mu = np.average(self.raw)
-			std = np.std(self.raw)
-			self._normalized = [(e - mu)/std for e in self.raw]
+			sigma = np.std(self.raw)
+			self._normalized = [(e - mu)/sigma for e in self.raw]
 		return self._normalized
 	
 	def _reset(self):
