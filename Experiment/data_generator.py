@@ -12,27 +12,37 @@ class Generator:
 		
 	def generate(self, name, max_samples):
 		sdo = SoundDataObject(name)
-		permLabels = Generator._getLabelPermutations()
-		for i in range(min(max_samples, len(permLabels))):
+		labelCombos = Generator._getLabelCombinations()
+		for i in range(min(max_samples, len(labelCombos))):
 			#use sound syns to get label and signal
-			label = permLabels[i]
+			labels = [label for label in labelCombos[i]]
 			syns = SoundSyns()
-			for key in label:
+			for key in labels:
 				syns.add_key(key)
 			#get buckets
 			decomp = SoundDecomposer(name)
 			decomp.readSignal(syns.signal)
 			#add buckets to sdo
-			sdo.addDataSingle(Sample(decomp.freqBuckets, label))
+			sdo.addDataSingle(Sample(decomp.freqBuckets, labels))
 		sdo.save()
 		return sdo
 		
 	@staticmethod
-	def _getLabelPermutations():
-		return Generator._getPerms(SoundSyns.key_mappings.keys())
+	def _getLabelCombinations():
+		return Generator._getCombos(SoundSyns.key_mappings.keys())
+		
+	@staticmethod
+	def _getCombos(items):
+		items = [e for e in items]
+		if len(items) <= 1:
+			return [items]
+		first, rest = items[0], items[1:]
+		restCombos = Generator._getCombos(rest)
+		return [[first]] + restCombos + [[first] + combo for combo in restCombos]
 		
 	@staticmethod
 	def _getPerms(items):
+		items = [e for e in items]
 		if len(items) <= 1:
 			return items
 		first, rest = items[0], items[1:]

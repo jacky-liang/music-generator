@@ -6,13 +6,17 @@ class SoundDataObject:
 		self.data = []
 		
 	def save(self):
-		file = open(self.name + ".sdo", 'w')
+		file = open(SoundDataObject.getFileName(self.name), 'w')
 		pickle.dump(self, file)
 		file.close()
 		
-	#static method
+	@staticmethod
+	def getFileName(name):
+		return name + ".sdo" if not name.endswith(".sdo") else name
+		
+	@staticmethod
 	def loadSdo(name):
-		file = open(self.name + ".sdo", 'r')
+		file = open(SoundDataObject.getFileName(name), 'r')
 		obj = pickle.load(file)
 		file.close()
 		return obj
