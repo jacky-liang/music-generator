@@ -5,10 +5,11 @@ import numpy as np
 from sound_bucket import SoundBucket
 
 class SoundDecomposer:
-	music_input_folder = "music_input_files/"
+	music_input_folder = "/"
 	bucket_size = 1.0/12
 	bucket_min_start = 4
 	bucket_max_end = 14
+	magic = 2.0
 	
 	def __init__(self, name):
 		self.name = name
@@ -18,13 +19,14 @@ class SoundDecomposer:
 		
 	def readFile(self, fileName):
 		path = SoundDecomposer.music_input_folder + fileName
-		self.rate, self.raw = read(path)
-		if len(self.raw[0]) > 1:
-			self.raw = [e[0] for e in self.raw]
-		self._reset()
+		self.rate, signal = read(path)
+		self.readSignal(signal)
+		
 		
 	def readSignal(self, signal):
-		self.raw =signal
+		if len(signal[0]) > 1:
+			signal = [e[0] for e in signal]
+		self.raw = signal
 		self._reset()
 	
 	@property
@@ -40,26 +42,31 @@ class SoundDecomposer:
 		self._logFreq = None
 		self._freqBuckets = None
 		self._normalized = None
+		self._rawFreqTable = None
 		
 	@property
 	def rawFreq(self):
 		if self._rawFreq is None:
-			self._rawFreq = rfft(self.normalized)
+			self._rawFreq = rfft(self.normalized)[1:]
 		return self._rawFreq
+		
+	@property
+	def rawFreqMap(self):
+		if self._rawFreqTable is None:
+			self._rawFreqTable = np.fft.fftfreq(len(self.rawFreq), SoundDecomposer.magic/self.rate)
+		return self._rawFreqTable
 
 	@property
-	def logFreq(self):
+	def logFreqTable(self):
 		if self._logFreq is None:
-			self._logFreq = []
-			for i in range(2, len(self.rawFreq)):
-				self._logFreq.append((log(i, 2), self.rawFreq[i]))
+			self._logFreq = [(log(self.rawFreqMap[i], 2), self.rawFreq[i]) for i in range(2, len(self.rawFreq))]
 		return self._logFreq
 		
 	@property
 	def freqBuckets(self):
 		if self._freqBuckets is None:
 			self._freqBuckets = []
-			self._bucketize(self.logFreq, self._freqBuckets)
+			self._bucketize(self.logFreqTable, self._freqBuckets)
 		return self._freqBuckets
 
 	def _bucketize(self, logFreq, buckets):

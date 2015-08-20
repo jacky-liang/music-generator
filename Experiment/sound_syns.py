@@ -11,13 +11,13 @@ class SoundSyns:
 		"A" : 440,
 	}
 
-	duration = 10 #seconds
-	output_path = "music_output_files/"
+	duration = 2 #seconds
+	output_path = "/"
 	amplitutde_threshold = 0.95
 	
 	rate = 44100
 	bitwidth = 8
-	channels = 2
+	channels = 1
 		
 	def __init__(self):
 		self.freqs = []
