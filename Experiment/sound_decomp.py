@@ -13,21 +13,20 @@ class SoundDecomposer:
 	
 	def __init__(self, name):
 		self.name = name
-		self.raw = None
-		self.rate = None
 		self._reset()
 		
 	def readFile(self, fileName):
+		self._reset()
 		path = SoundDecomposer.music_input_folder + fileName
-		self.rate, signal = read(path)
-		self.readSignal(signal)
+		rate, signal = read(path)
+		self.readSignal(rate, signal)
 		
-		
-	def readSignal(self, signal):
+	def readSignal(self, rate, signal):
+		self._reset()
+		self.rate = rate
 		if len(signal[0]) > 1:
 			signal = [e[0] for e in signal]
 		self.raw = signal
-		self._reset()
 	
 	@property
 	def normalized(self):
@@ -38,6 +37,8 @@ class SoundDecomposer:
 		return self._normalized
 	
 	def _reset(self):
+		self.raw = None
+		self.rate = None
 		self._rawFreq = None
 		self._logFreq = None
 		self._freqBuckets = None
@@ -55,11 +56,11 @@ class SoundDecomposer:
 		if self._rawFreqTable is None:
 			self._rawFreqTable = np.fft.fftfreq(len(self.rawFreq), SoundDecomposer.magic/self.rate)
 		return self._rawFreqTable
-
+	
 	@property
 	def logFreqTable(self):
 		if self._logFreq is None:
-			self._logFreq = [(log(self.rawFreqMap[i], 2), self.rawFreq[i]) for i in range(2, len(self.rawFreq))]
+			self._logFreq = [(log(abs(self.rawFreqMap[i]), 2), self.rawFreq[i]) for i in range(2, len(self.rawFreq))]
 		return self._logFreq
 		
 	@property

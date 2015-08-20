@@ -21,7 +21,7 @@ class Generator:
 				syns.add_key(key)
 			#get buckets
 			decomp = SoundDecomposer(name)
-			decomp.readSignal(syns.signal)
+			decomp.readSignal(SoundSyns.rate, syns.signal)
 			#add buckets to sdo
 			sdo.addDataSingle(Sample(decomp.freqBuckets, labels))
 		sdo.save()
