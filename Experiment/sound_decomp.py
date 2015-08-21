@@ -72,20 +72,23 @@ class SoundDecomposer:
 		return self._freqBuckets
 
 	def _bucketize(self, logFreq, buckets):
-		cur_start = SoundDecomposer.bucket_min_start
-		cur_end = cur_start + SoundDecomposer.bucket_size
-		cur_bucket = 0
-		buckets.append(SoundBucket(cur_start, cur_end))
+		cur_bucket = 1
+		while True:
+			cur_start = SoundDecomposer.bucket_min_start + (cur_bucket - 1) * SoundDecomposer.bucket_size
+			cur_end = cur_start + SoundDecomposer.bucket_size
+			if cur_end > SoundDecomposer.bucket_max_end:
+				break
+			buckets.append(SoundBucket(cur_start, cur_end))
+			cur_bucket += 1
+			
 		for i in range(len(logFreq)):
 			freq = logFreq[i][0]
 			amp = abs(logFreq[i][1])
-			if freq > SoundDecomposer.bucket_max_end:
-				break
-			if freq < cur_start:
+			if freq > SoundDecomposer.bucket_max_end or freq < SoundDecomposer.bucket_min_start:
 				continue
-			if freq > cur_end:
-				cur_start = cur_end
-				cur_end += SoundDecomposer.bucket_size
-				buckets.append(SoundBucket(cur_start, cur_end))
-				cur_bucket += 1
-			buckets[cur_bucket].addDrop(freq, amp)
+			cur_bucket = (freq - SoundDecomposer.bucket_min_start) / SoundDecomposer.bucket_size 
+			buckets[int(cur_bucket)].addDrop(freq, amp)
+			
+		for bucket in buckets:
+			if len(bucket.freqTable) == 0:
+				bucket.addDrop(0, 0)

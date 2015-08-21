@@ -53,8 +53,3 @@ class Generator:
 			for j in range(len(cur_perm)):
 				perms.append(cur_perm[:j] + first + cur_perm[j:])
 		return perms
-		
-		
-	
-	
-	
