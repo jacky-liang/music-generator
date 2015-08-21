@@ -24,7 +24,8 @@ class SoundDecomposer:
 	def readSignal(self, rate, signal):
 		self._reset()
 		self.rate = rate
-		if len(signal[0]) > 1:
+		# If elements of signal are arrays, then pull out the first elements
+		if hasattr(signal[0], '__len__'):
 			signal = [e[0] for e in signal]
 		self.raw = signal
 	
@@ -77,7 +78,7 @@ class SoundDecomposer:
 		buckets.append(SoundBucket(cur_start, cur_end))
 		for i in range(len(logFreq)):
 			freq = logFreq[i][0]
-			amp = logFreq[i][1]
+			amp = abs(logFreq[i][1])
 			if freq > SoundDecomposer.bucket_max_end:
 				break
 			if freq < cur_start:
