@@ -90,5 +90,5 @@ class SoundDecomposer:
 			buckets[int(cur_bucket)].addDrop(freq, amp)
 			
 		for bucket in buckets:
-			if len(bucket.freqTable) == 0:
+			if bucket.numSamples == 0:
 				bucket.addDrop(0, 0)
