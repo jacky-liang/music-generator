@@ -2,6 +2,7 @@ from sound_data_object import SoundDataObject
 from sound_syns import SoundSyns
 from sound_decomp import SoundDecomposer
 from sample import Sample
+from random import shuffle
 #Generate an SDO that has an array of training sample object
 #each traning sample contains its data in .data, and labels in .labels
 
@@ -11,8 +12,13 @@ class Generator:
 		self.duration = duration
 		
 	def generate(self, name, max_samples):
-		sdo = SoundDataObject(name)
 		labelCombos = Generator._getLabelCombinations()
+		sdo = self._getSdo(max_samples, labelCombos)
+		sdo.save()
+		return sdo
+		
+	def _getSdo(self, name, max_samples, labelCombos):
+		sdo = SoundDataObject(name)
 		for i in range(min(max_samples, len(labelCombos))):
 			#use sound syns to get label and signal
 			labels = [label for label in labelCombos[i]]
@@ -24,8 +30,31 @@ class Generator:
 			decomp.readSignal(SoundSyns.rate, syns.signal)
 			#add buckets to sdo
 			sdo.addDataSingle(Sample(decomp.freqBuckets, labels))
-		sdo.save()
 		return sdo
+		
+	def generateSet(self, name, max_samples, training_percent, cv_percent, test_percent):
+		if abs(training_percent + test_percent + cv_percent - 1) > 1e-5:
+			raise ValueError("The input percents must add up to 1!")
+		
+		labelCombos = Generator._getLabelCombinations()
+		shuffle(labelCombos)
+		
+		lastTrainingIndex = int(training_percent * len(labelCombos))
+		lastCvIndex = int((training_percent + cv_percent) * len(labelCombos))
+		
+		labelsTraining = labelCombos[: lastTrainingIndex]
+		labelsCv = labelCombos[lastTrainingIndex : lastCvIndex]
+		labelsTest = labelCombos[lastCvIndex:]
+		
+		sdoTraining = self._getSdo(name + "_Training", int(max_samples * training_percent), labelsTraining)
+		sdoCv = self._getSdo(name + "_CV", int(max_samples * cv_percent), labelsCv)
+		sdoTest = self._getSdo(name + "_Test", int(max_samples * test_percent), labelsTest)
+		
+		sdoTraining.save()
+		sdoCv.save()
+		sdoTest.save()
+		
+		return sdoTraining, sdoCv, sdoTest
 		
 	@staticmethod
 	def _getLabelCombinations():
@@ -53,3 +82,5 @@ class Generator:
 			for j in range(len(cur_perm)):
 				perms.append(cur_perm[:j] + first + cur_perm[j:])
 		return perms
+		
+result = Generator().generateSet("keys", 20, 0.7, 0.15, 0.15)
