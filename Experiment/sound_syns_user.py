@@ -1,8 +1,15 @@
 from sound_syns import SoundSyns
 
-chord = SoundSyns()
-chord.bitwidth = 32
-chord.add_key("C")
-chord.add_key("E")
-chord.add_key("G")
-chord.write("chord.wav")	
+chordC = SoundSyns()
+chordC.bitwidth = 32
+chordC.add_key("C")
+chordC.add_key("E")
+chordC.add_key("G")
+chordC.write("chordC.wav")
+
+chordD = SoundSyns()
+chordD.bitwidth = 32
+chordD.add_key("D")
+chordD.add_key("F")
+chordD.add_key("A")
+chordD.write("chordD.wav")

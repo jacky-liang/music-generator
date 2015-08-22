@@ -5,14 +5,17 @@ from numpy.fft import rfft, irfft
 class SoundSyns:
 
 	key_mappings = {
-		"C" : 220,
-		"E" : 277,
-		"G" : 330,
+		"B" : 246.9,
+		"C" : 261.6,
+		"D" : 293.7,
+		"E" : 329.6,
+		"F" : 349.2,
+		"G" : 392,
 		"A" : 440,
 	}
 
 	duration = 2 #seconds
-	output_path = "/"
+	output_path = ""
 	amplitutde_threshold = 0.95
 	
 	rate = 44100
