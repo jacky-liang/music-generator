@@ -1,0 +1,6 @@
+[submodule "vendor/theano"]
+	path = vendor/theano
+	url = https://github.com/Theano/Theano.git
+[submodule "vendor/lasagne"]
+	path = vendor/lasagne
+	url = https://github.com/Lasagne/Lasagne.git
