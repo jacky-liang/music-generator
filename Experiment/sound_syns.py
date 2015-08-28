@@ -12,6 +12,9 @@ class SoundSyns:
 		"F" : 349.2,
 		"G" : 392,
 		"A" : 440,
+		"B2" : 493.9,
+		"C2" : 523.3
+		"D2" : 587.3
 	}
 
 	duration = 2 #seconds
